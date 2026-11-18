@@ -528,7 +528,7 @@
   },
   {
     "id": "tarmac-works-ferrari-f40-black-event-special-edition-road64",
-    "number": "",
+    "number": "T64R-076-BK",
     "brand": "Ferrari",
     "name": "Ferrari F40 Black — Event Special Edition (ROAD64)",
     "variant": "Regular",
@@ -537,11 +537,12 @@
     "vehicleMake": "Ferrari",
     "editionType": "Event Exclusive",
     "photoSource": "https://www.tarmacworks.com/products/1-64-ferrari-f40-black-event-special-edition-tarmac-works-road64",
-    "verification": "Official Tarmac Works 1:64 product listing; SKU left blank where not confirmed"
+    "verification": "Manufacturer product page confirms exact 1:64 product SKU; release and edition data may require separate review.",
+    "photo": "https://www.tarmacworks.com/cdn/shop/files/T64R-076-BK_M01_1__jpg.jpg?v=1776073449&width=960"
   },
   {
     "id": "tarmac-works-ferrari-f40-lm-red-hobby64",
-    "number": "",
+    "number": "T64-075-RE2",
     "brand": "Ferrari",
     "name": "Ferrari F40 LM — Red (HOBBY64)",
     "variant": "Regular",
@@ -550,11 +551,12 @@
     "vehicleMake": "Ferrari",
     "editionType": "Regular",
     "photoSource": "https://www.tarmacworks.com/products/1-64-ferrari-f40-lm-red-tarmac-works-x-ixo-models-hobby64",
-    "verification": "Official Tarmac Works 1:64 product listing; SKU left blank where not confirmed"
+    "verification": "Manufacturer product page confirms exact 1:64 product SKU; release and edition data may require separate review.",
+    "photo": "https://www.tarmacworks.com/cdn/shop/files/T64-075-RE2_M01.jpg?v=1782453925&width=960"
   },
   {
     "id": "tarmac-works-hyundai-i20-n-rally1-hybrid-11-croatia-rally-2024-hobby64",
-    "number": "",
+    "number": "T64-089-24CR11",
     "brand": "Hyundai",
     "name": "Hyundai i20 N Rally1 Hybrid #11 — Croatia Rally 2024 (HOBBY64)",
     "variant": "Regular",
@@ -563,7 +565,8 @@
     "vehicleMake": "Hyundai",
     "editionType": "Regular",
     "photoSource": "https://www.tarmacworks.com/products/1-64-hyundai-i20-n-rally1-hybrid-croatia-rally-2024-11-tarmac-works-x-ixo-models-hobby64",
-    "verification": "Official Tarmac Works 1:64 product listing; SKU left blank where not confirmed"
+    "verification": "Manufacturer product page confirms exact 1:64 product SKU; release and edition data may require separate review.",
+    "photo": "https://www.tarmacworks.com/cdn/shop/files/T64-089-24CR11_M01.jpg?v=1782456959&width=960"
   },
   {
     "id": "tarmac-works-t64-097-26hec",
@@ -583,7 +586,7 @@
   },
   {
     "id": "tarmac-works-mercedes-amg-f1-w14-e-performance-44-italian-gp-2023-lewis-hamilton-global64",
-    "number": "",
+    "number": "T64G-F064-LH3",
     "brand": "Mercedes-Benz",
     "name": "Mercedes-AMG F1 W14 E Performance #44 — Italian GP 2023 Lewis Hamilton (GLOBAL64)",
     "variant": "Regular",
@@ -592,7 +595,9 @@
     "vehicleMake": "Mercedes-Benz",
     "editionType": "Regular",
     "photoSource": "https://www.tarmacworks.com/products/1-64-mercedes-amg-f1-w14-e-performance-italian-grand-prix-2023-44-lewis-hamilton-tarmac-works-x-ixo-models-global64",
-    "verification": "Official Tarmac Works 1:64 product listing; SKU left blank where not confirmed"
+    "verification": "Manufacturer product page confirms exact 1:64 product SKU; release and edition data may require separate review.",
+    "chaseAvailable": true,
+    "chaseNotes": "Official product page says a chase version can replace the regular model. Chase is not added as separate catalogue entry until its appearance and identity are verified."
   },
   {
     "id": "tarmac-works-t64-062-26nur80",
@@ -612,7 +617,7 @@
   },
   {
     "id": "tarmac-works-mercedes-benz-amg-gt-black-series-grey-global64",
-    "number": "",
+    "number": "T64G-042-GY",
     "brand": "Mercedes-Benz",
     "name": "Mercedes-Benz AMG GT Black Series — Grey (GLOBAL64)",
     "variant": "Regular",
@@ -620,12 +625,14 @@
     "manufacturer": "Tarmac Works",
     "vehicleMake": "Mercedes-Benz",
     "editionType": "Regular",
-    "photoSource": "https://www.tarmacworks.com/products/1-64-mercedes-benz-amg-gt-black-series-grey-tarmac-works-global64",
-    "verification": "Official Tarmac Works 1:64 product listing; SKU left blank where not confirmed"
+    "photoSource": "https://www.tarmacworks.com/collections/1-64-scale/products/1-64-mercedes-benz-amg-gt-black-series-grey-tarmac-works-global64",
+    "verification": "Manufacturer product page confirms exact 1:64 product SKU; release and edition data may require separate review.",
+    "chaseAvailable": true,
+    "chaseNotes": "Official product page says a chase version can replace the regular model. Chase is not added as separate catalogue entry until its appearance and identity are verified."
   },
   {
     "id": "tarmac-works-mitsubishi-lancer-evolution-vi-tme-11-super-taikyu-2000-hobby64",
-    "number": "",
+    "number": "T64-021-00ST11",
     "brand": "Mitsubishi",
     "name": "Mitsubishi Lancer Evolution VI TME #11 — Super Taikyu 2000 (HOBBY64)",
     "variant": "Regular",
@@ -633,12 +640,12 @@
     "manufacturer": "Tarmac Works",
     "vehicleMake": "Mitsubishi",
     "editionType": "Regular",
-    "photoSource": "https://www.tarmacworks.com/products/1-64-mitsubishi-lancer-evolution-vi-tme-super-taikyu-series-2000-11-tarmac-works-hobby64",
-    "verification": "Official Tarmac Works 1:64 product listing; SKU left blank where not confirmed"
+    "photoSource": "https://www.tarmacworks.com/en-jp/collections/tarmac-works/products/1-64-mitsubishi-lancer-evolution-vi-tme-super-taikyu-series-2000-11-tarmac-works-hobby64",
+    "verification": "Manufacturer product page confirms exact 1:64 product SKU; release and edition data may require separate review."
   },
   {
     "id": "tarmac-works-mitsubishi-lancer-gsr-evolution-green-metallic-global64",
-    "number": "",
+    "number": "T64G-048-GR",
     "brand": "Mitsubishi",
     "name": "Mitsubishi Lancer GSR Evolution — Green Metallic (GLOBAL64)",
     "variant": "Regular",
@@ -647,7 +654,10 @@
     "vehicleMake": "Mitsubishi",
     "editionType": "Regular",
     "photoSource": "https://www.tarmacworks.com/products/1-64-mitsubishi-lancer-gsr-evolution-green-metallic-tarmac-works-global64",
-    "verification": "Official Tarmac Works 1:64 product listing; SKU left blank where not confirmed"
+    "verification": "Manufacturer product page confirms exact 1:64 product SKU; release and edition data may require separate review.",
+    "photo": "https://www.tarmacworks.com/cdn/shop/files/T64G-048-GR_M02.jpg?v=1784514660&width=960",
+    "chaseAvailable": true,
+    "chaseNotes": "Official product page says a chase version can replace the regular model. Chase is not added as separate catalogue entry until its appearance and identity are verified."
   },
   {
     "id": "tarmac-works-t64g-061-mj",
@@ -679,7 +689,7 @@
   },
   {
     "id": "tarmac-works-pandem-toyota-gr-yaris-toy-story-30th-anniversary-hobby64",
-    "number": "",
+    "number": "T64-080-TS2",
     "brand": "Toyota",
     "name": "Pandem Toyota GR Yaris Toy Story 30th Anniversary (HOBBY64)",
     "variant": "Regular",
@@ -687,8 +697,8 @@
     "manufacturer": "Tarmac Works",
     "vehicleMake": "Toyota",
     "editionType": "Limited Edition",
-    "photoSource": "https://www.tarmacworks.com/products/1-64-pandem-toyota-gr-yaris-toy-story-30th-anniversary-with-tarmac-cards-tarmac-works-hobby64",
-    "verification": "Official Tarmac Works 1:64 product listing; SKU left blank where not confirmed"
+    "photoSource": "https://www.tarmacworks.com/en-ca/collections/hobby64/products/1-64-pandem-toyota-gr-yaris-toy-story-30th-anniversary-with-tarmac-cards-tarmac-works-hobby64",
+    "verification": "Manufacturer product page confirms exact 1:64 product SKU; release and edition data may require separate review."
   },
   {
     "id": "tarmac-works-t64-093-24psc01",
@@ -707,7 +717,7 @@
   },
   {
     "id": "tarmac-works-porsche-rwb-930-southern-cross-hobby64",
-    "number": "",
+    "number": "T64-TL015-SC",
     "brand": "Porsche",
     "name": "Porsche RWB 930 Southern Cross (HOBBY64)",
     "variant": "Regular",
@@ -716,11 +726,12 @@
     "vehicleMake": "Porsche",
     "editionType": "Regular",
     "photoSource": "https://www.tarmacworks.com/products/1-64-rwb-930-southern-cross-tarmac-works-hobby64",
-    "verification": "Official Tarmac Works 1:64 product listing; SKU left blank where not confirmed"
+    "verification": "Manufacturer product page confirms exact 1:64 product SKU; release and edition data may require separate review.",
+    "photo": "https://www.tarmacworks.com/cdn/shop/files/T64-TL015-SC_M01.jpg?v=1784538151&width=960"
   },
   {
     "id": "tarmac-works-toyota-gr-yaris-rally1-hybrid-69-latvia-2024-winner-hobby64",
-    "number": "",
+    "number": "T64-085-24RL69",
     "brand": "Toyota",
     "name": "Toyota GR Yaris Rally1 Hybrid #69 — Latvia 2024 Winner (HOBBY64)",
     "variant": "Regular",
@@ -728,8 +739,8 @@
     "manufacturer": "Tarmac Works",
     "vehicleMake": "Toyota",
     "editionType": "Regular",
-    "photoSource": "https://www.tarmacworks.com/products/1-64-toyota-gr-yaris-rally1-hybrid-rally-latvia-2024-winner-69-tarmac-works-x-ixo-models-hobby64",
-    "verification": "Official Tarmac Works 1:64 product listing; SKU left blank where not confirmed"
+    "photoSource": "https://www.tarmacworks.com/en-sg/collections/new-releases/products/1-64-toyota-gr-yaris-rally1-hybrid-rally-latvia-2024-winner-69-tarmac-works-x-ixo-models-hobby64",
+    "verification": "Manufacturer product page confirms exact 1:64 product SKU; release and edition data may require separate review."
   },
   {
     "id": "tarmac-works-t64-041-fal",
@@ -823,7 +834,7 @@
   },
   {
     "id": "inno64-honda-s2000-ap1-j-s-racing-hong-kong-toycar-salon-2025",
-    "number": "",
+    "number": "IN64-S2000JS-HKTS25",
     "brand": "Honda",
     "name": "Honda S2000 AP1 J’S Racing — Hong Kong Toycar Salon 2025",
     "variant": "Regular",
@@ -831,12 +842,12 @@
     "manufacturer": "INNO64",
     "vehicleMake": "Honda",
     "editionType": "Event Exclusive",
-    "photoSource": "https://www.inno-models.com/product/honda-s2000-ap1-js-racing-hong-kong-toycar-salon-2025-event-edition",
-    "verification": "Official INNO Models 1:64 product page; event/edition indicated in listing"
+    "photoSource": "https://www.inno-models.com/product/honda-s2000-ap1-js-racing-hong-kong-toycar-salon-2025-event-edition/",
+    "verification": "Manufacturer product page confirms exact 1:64 product SKU; release and edition data may require separate review."
   },
   {
     "id": "inno64-inno64-x-dpls-porsche-rwb-964-pink-tokyo-auto-salon-2026",
-    "number": "",
+    "number": "IN64-964RWB-UNDFTD-03",
     "brand": "Porsche",
     "name": "INNO64 x DPLS Porsche RWB 964 Pink — Tokyo Auto Salon 2026",
     "variant": "Regular",
@@ -844,8 +855,8 @@
     "manufacturer": "INNO64",
     "vehicleMake": "Porsche",
     "editionType": "Event Exclusive",
-    "photoSource": "https://www.inno-models.com/product/inno64-x-dpls-rwb-964-pink-tokyo-auto-salon-2026",
-    "verification": "Official INNO Models 1:64 product page; event/edition indicated in listing"
+    "photoSource": "https://www.inno-models.com/product/inno64-x-dpls-rwb-964-pink-tokyo-auto-salon-2026/",
+    "verification": "Manufacturer product page confirms exact 1:64 product SKU; release and edition data may require separate review."
   },
   {
     "id": "inno64-in64-rx7fcp-tmcs25-chase",
@@ -999,7 +1010,7 @@
   },
   {
     "id": "inno64-nissan-top-secret-gt-r-r35-hong-kong-vintage-diecast-expo-2025",
-    "number": "",
+    "number": "IN64-R35TS-HKVDE25",
     "brand": "Nissan",
     "name": "Nissan Top Secret GT-R R35 — Hong Kong Vintage Diecast Expo 2025",
     "variant": "Regular",
@@ -1007,8 +1018,8 @@
     "manufacturer": "INNO64",
     "vehicleMake": "Nissan",
     "editionType": "Event Exclusive",
-    "photoSource": "https://www.inno-models.com/product/gt-r-r35-top-secret-hong-kong-vintage-diecast-expo-2025-event-edition",
-    "verification": "Official INNO Models 1:64 product page; event/edition indicated in listing"
+    "photoSource": "https://www.inno-models.com/product/gt-r-r35-top-secret-hong-kong-vintage-diecast-expo-2025-event-edition/",
+    "verification": "Manufacturer product page confirms exact 1:64 product SKU; release and edition data may require separate review."
   },
   {
     "id": "inno64-in64-vr32ts-taskl25",
@@ -1086,7 +1097,7 @@
   },
   {
     "id": "inno64-toyota-supra-a80-top-secret-gt300-silver-gtshow-2025",
-    "number": "",
+    "number": "IN64-A80TS-GTSHOW25",
     "brand": "Toyota",
     "name": "Toyota Supra A80 Top Secret GT300 Silver — GTSHOW 2025",
     "variant": "Regular",
@@ -1094,8 +1105,8 @@
     "manufacturer": "INNO64",
     "vehicleMake": "Toyota",
     "editionType": "Event Exclusive",
-    "photoSource": "https://www.inno-models.com/product/toyota-supra-a80-top-secret-gt300-silver-gtshow-2025-event-edition",
-    "verification": "Official INNO Models 1:64 product page; event/edition indicated in listing"
+    "photoSource": "https://www.inno-models.com/product/toyota-supra-a80-top-secret-gt300-silver-gtshow-2025-event-edition/",
+    "verification": "Manufacturer product page confirms exact 1:64 product SKU; release and edition data may require separate review."
   },
   {
     "id": "inno64-in64-a80ts-tas25",
