@@ -1,6 +1,6 @@
 const $=id=>document.getElementById(id);const C=window.ARBOX_CONFIG||{};
 const cloudReady=!!(C.supabaseUrl&&C.supabaseAnonKey&&window.supabase);
-const db=cloudReady?window.supabase.createClient(C.supabaseUrl,C.supabaseAnonKey):null;
+const db=cloudReady?window.supabase.createClient(C.supabaseUrl,C.supabaseAnonKey,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}}):null;
 let catalog=[],state={},session=null,filter='All',radar=[],customModels=[],communityModels=[];
 const PHOTO_BUCKET='arbox-photo-contributions';
 const MODEL_BUCKET='arbox-model-submissions';
@@ -57,7 +57,111 @@ async function saveStatus(id,status){
   if(error)alert('Saved locally, but cloud sync failed: '+error.message);
  }
 }
-function authUI(message=''){let area=$('authArea');if(!cloudReady){area.innerHTML='<b>Local preview mode</b><p>Collection changes are saved on this device. To enable private cloud sync, fill in config.js and run schema.sql in Supabase.</p>';return}if(session){area.innerHTML=`<b>☁ Cloud sync enabled</b><div class="muted">Signed in: ${esc(session.user.email||'collector')}</div><div class="auth"><button id="signOut" class="outline">Sign out</button></div>${message?`<p>${esc(message)}</p>`:''}`;$('signOut').onclick=async()=>{await db.auth.signOut();session=null;customModels=[];switchState();authUI();};return}area.innerHTML=`<b>Sign in for cloud sync</b><p class="muted">Enter your email for a secure sign-in link.</p><div class="auth"><input id="email" type="email" placeholder="you@example.com"><button id="login" class="primary">Send sign-in link</button></div>${message?`<p>${esc(message)}</p>`:''}`;$('login').onclick=async()=>{let email=$('email').value.trim();if(!email)return;let {error}=await db.auth.signInWithOtp({email,options:{emailRedirectTo:location.origin+location.pathname}});authUI(error?error.message:'Check your email and open the sign-in link.')};}
+const loginPromptKey='arbox-garage-login-prompt-v1';
+let refreshInProgress=false;
+function displayName(){
+ if(!session)return 'Guest';
+ const metadata=session.user.user_metadata||{};
+ return String(metadata.full_name||metadata.name||session.user.email||'Collector');
+}
+function setLoginMessage(message){$('loginStatus').textContent=message||''}
+function openLoginDialog(message=''){
+ $('accountMenu').hidden=true;$('accountBtn').setAttribute('aria-expanded','false');
+ setLoginMessage(message);
+ if(!$('loginDialog').open)$('loginDialog').showModal();
+}
+function closeLoginDialog(){if($('loginDialog').open)$('loginDialog').close()}
+function authUI(message=''){
+ const area=$('authArea'),button=$('accountBtn'),menu=$('accountMenu');
+ menu.hidden=true;button.setAttribute('aria-expanded','false');
+ if(!cloudReady){
+  button.textContent='Guest · Log in';
+  area.innerHTML='<b>Guest preview</b><div class="muted">Cloud sign-in is not configured. Your selections are saved only in this browser.</div>';
+  return;
+ }
+ if(session){
+  const label=displayName();
+  button.textContent='👤 '+(label.length>17?label.slice(0,16)+'…':label);
+  $('accountIdentity').textContent=session.user.email||label;
+  $('accountSignOut').hidden=false;
+  $('accountLogin').hidden=true;
+  area.innerHTML=`<b>☁ Cloud sync enabled</b><div class="muted">Signed in: ${esc(session.user.email||label)}</div>${message?`<p class="muted">${esc(message)}</p>`:''}`;
+ }else{
+  button.textContent='👤 Log in';
+  $('accountIdentity').textContent='Guest · local collection';
+  $('accountSignOut').hidden=true;
+  $('accountLogin').hidden=false;
+  $('accountLogin').textContent='Log in / Sign up';
+  area.innerHTML=`<b>Guest mode</b><div class="muted">Browse all four brands and keep a local collection on this device. Sign in to sync across devices and submit models or photos.</div>${message?`<p class="muted">${esc(message)}</p>`:''}`;
+ }
+}
+async function oauthLogin(provider){
+ if(!db){setLoginMessage('Cloud login is not configured yet.');return}
+ setLoginMessage('Opening Google sign-in…');
+ const options={redirectTo:location.origin+location.pathname};
+ const {error}=await db.auth.signInWithOAuth({provider:'google',options});
+ if(error)setLoginMessage('Sign-in could not start: '+error.message+'. Check the provider setup in Supabase.');
+}
+async function emailLinkLogin(){
+ if(!db){setLoginMessage('Cloud login is not configured yet.');return}
+ const email=$('loginEmail').value.trim();
+ if(!email){setLoginMessage('Enter your email address.');return}
+ $('loginEmailSend').disabled=true;
+ try{
+  const {error}=await db.auth.signInWithOtp({email,options:{emailRedirectTo:location.origin+location.pathname}});
+  setLoginMessage(error?'Could not send link: '+error.message:'Check your inbox and open the sign-in link on this device.');
+ }finally{$('loginEmailSend').disabled=false}
+}
+async function signOutToGuest(){
+ if(!db)return;
+ $('accountMenu').hidden=true;
+ const {error}=await db.auth.signOut({scope:'local'});
+ if(error){authUI('Could not sign out: '+error.message);return}
+ session=null;customModels=[];photoAdmin=false;photoPending=new Set();switchState();authUI('Signed out. You are now browsing as a guest.');
+ $('photoAdminPanel').hidden=true;$('modelAdminPanel').hidden=true;
+}
+async function refreshAll({quiet=false}={}){
+ if(refreshInProgress)return;
+ refreshInProgress=true;
+ const button=$('syncBtn');
+ button.disabled=true;button.textContent='↻ Refreshing…';
+ try{
+  await sync();
+  await loadPublishedModels();
+  await loadPhotoContributions();
+  await loadMyModelSubmissions();
+  if(photoAdmin)await loadModelAdminQueue();
+  if(!quiet)authUI(session?'Your garage has been refreshed.':'Public catalogue refreshed. Guest changes stay on this device.');
+ }catch(e){
+  authUI('Refresh failed: '+e.message);
+ }finally{refreshInProgress=false;button.disabled=false;button.textContent='↻ Refresh'}
+}
+function installPullToRefresh(){
+ // A gentle top-of-page gesture; browser-native pull-to-refresh also remains usable.
+ let initialY=0,armed=false,tracking=false;
+ const hint=$('pullHint');
+ document.addEventListener('touchstart',e=>{
+  const target=e.target;
+  tracking=!!(e.touches.length===1&&window.scrollY<6&&
+   !target.closest('dialog,input,select,textarea,button,[contenteditable="true"]'));
+  initialY=tracking?e.touches[0].clientY:0;
+  armed=false;
+ },{passive:true});
+ document.addEventListener('touchmove',e=>{
+  if(!tracking||e.touches.length!==1)return;
+  const delta=e.touches[0].clientY-initialY;
+  if(window.scrollY>6||delta<0){tracking=false;hint.hidden=true;return}
+  armed=delta>95;
+  hint.textContent=armed?'Release to refresh catalogue':'Pull down to refresh';
+  hint.hidden=delta<28;
+ },{passive:true});
+ document.addEventListener('touchend',()=>{
+  const shouldRefresh=tracking&&armed;
+  tracking=false;armed=false;hint.hidden=true;
+  if(shouldRefresh)refreshAll();
+ },{passive:true});
+ document.addEventListener('touchcancel',()=>{tracking=false;armed=false;hint.hidden=true},{passive:true});
+}
 async function loadCloud(){
  if(!db||!session)return;
  const [collections,extras]=await Promise.all([
@@ -85,7 +189,7 @@ function clearPhotoPreview(){
  $('photoCameraInput').value='';$('photoGalleryInput').value='';
 }
 function openPhotoDialog(modelId){
- if(!session||!db){authUI('Sign in before contributing photographs.');$('authArea').scrollIntoView({behavior:'smooth',block:'start'});return}
+ if(!session||!db){openLoginDialog('Sign in to contribute model photographs. Guests can still browse and track models locally.');return}
  const model=allModels().find(x=>x.id===modelId);
  if(!model){return}
  if(photoPending.has(modelId)){return}
@@ -280,7 +384,7 @@ async function addModelPhotos(files){
  $('modelPhotoCameraInput').value='';$('modelPhotoGalleryInput').value='';
 }
 async function submitMissingModel(){
- if(!db||!session){modelStatus('Sign in before submitting a model.');$('authArea').scrollIntoView({behavior:'smooth'});return}
+ if(!db||!session){modelStatus('Sign in to submit a model for review.');openLoginDialog('Sign in to submit a missing model.');return}
  const brand=$('modelBrand').value,vehicle_make=$('modelMake').value.trim(),name=$('modelName').value.trim(),
   product_code=$('modelCode').value.trim(),edition_type=$('modelEdition').value,release=$('modelRelease').value,
   source_url=$('modelSource').value.trim(),note=$('modelNote').value.trim();
@@ -377,7 +481,18 @@ async function start(){
   document.querySelectorAll('#filters button').forEach(x=>x.classList.toggle('active',x===b));
   render();
  });
- $('syncBtn').onclick=async()=>{await sync();await loadPublishedModels();await loadPhotoContributions();await loadMyModelSubmissions()};
+ $('syncBtn').onclick=()=>refreshAll();
+ $('accountMenuRefresh').onclick=()=>{$('accountMenu').hidden=true;refreshAll()};
+ $('accountBtn').onclick=()=>{if(!session){openLoginDialog();return}const menu=$('accountMenu');menu.hidden=!menu.hidden;$('accountBtn').setAttribute('aria-expanded',String(!menu.hidden))};
+ $('accountLogin').onclick=()=>openLoginDialog();
+ $('accountSignOut').onclick=signOutToGuest;
+ $('loginClose').onclick=closeLoginDialog;
+ $('loginGuest').onclick=()=>{localStorage.setItem(loginPromptKey,'1');closeLoginDialog();authUI()};
+ $('loginGoogle').onclick=()=>oauthLogin('google');
+ $('loginEmailForm').onsubmit=e=>{e.preventDefault();emailLinkLogin()};
+ $('loginDialog').addEventListener('close',()=>localStorage.setItem(loginPromptKey,'1'));
+ document.addEventListener('click',e=>{if(!$('accountMenu').hidden&&!e.target.closest('.account-anchor')){$('accountMenu').hidden=true;$('accountBtn').setAttribute('aria-expanded','false')}});
+ installPullToRefresh();
  $('refresh').onclick=loadRadar;
  $('export').onclick=csv;
  $('push').onclick=enablePush;
@@ -402,10 +517,11 @@ async function start(){
    const old=session?.user?.id;session=s;
    if(old!==s?.user?.id){customModels=[];photoPending=new Set();switchState()}
    authUI();
-   if(s)setTimeout(async()=>{await loadCloud();await loadPublishedModels();await loadPhotoContributions();await loadMyModelSubmissions()},0);
+   if(s){closeLoginDialog();setTimeout(async()=>{await loadCloud();await loadPublishedModels();await loadPhotoContributions();await loadMyModelSubmissions()},0);}
    else {$('photoAdminPanel').hidden=true;$('modelAdminPanel').hidden=true;photoAdmin=false;loadPhotoContributions()}
   });
  }
- await sync();await loadPublishedModels();await loadPhotoContributions();await loadMyModelSubmissions();
+ await refreshAll({quiet:true});
+ if(!session&&!localStorage.getItem(loginPromptKey)){openLoginDialog();}
 }
 start().catch(e=>{$('authArea').textContent='Could not load app: '+e.message});
