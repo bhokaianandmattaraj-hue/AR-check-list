@@ -10,11 +10,13 @@ let photoOverrides={},photoPending=new Set(),photoAdmin=false,selectedPhotoModel
 const guestKey='arbox-garage-guest-v2';
 function getLocal(key){try{return JSON.parse(localStorage.getItem(key)||'{}')}catch{return {}}}
 function userKey(){return session?'arbox-garage-user-'+session.user.id:guestKey}
-function saveLocal(){localStorage.setItem(userKey(),JSON.stringify(state))}
-function switchState(){state=getLocal(userKey());render()}
+// Guests may browse the catalogue, but cannot create a saved garage.
+// Never copy browser-only guest selections into an authenticated account.
+function saveLocal(){if(session)localStorage.setItem(userKey(),JSON.stringify(state))}
+function switchState(){state=session?getLocal(userKey()):{};render()}
 function allModels(){return [...catalog,...communityModels,...customModels].filter(eligible)}
 
-state=getLocal(guestKey);
+state={};
 const statuses=['Owned','Ordered','Missing','Unconfirmed','Wishlist'];
 const allowedBrands=['ARBOX','PGM','Tarmac Works','INNO64'];
 const editionTypes=['Regular','Chase','Event Exclusive','Limited Edition'];
@@ -27,9 +29,10 @@ function render(){
  const q=$('search').value.toLowerCase();
  const all=allModels();
  const items=all.filter(m=>(filter==='All'||maker(m)===filter||(filter==='Chase'&&edition(m)==='Chase')||(filter==='Event'&&edition(m)==='Event Exclusive')||(filter==='Limited'&&edition(m)==='Limited Edition')||(filter==='Upcoming'&&['TBA','Preorder','Announced','Upcoming'].includes(m.release)))&&(`${m.number} ${m.name} ${m.brand} ${maker(m)} ${edition(m)}`.toLowerCase().includes(q)));
- $('owned').textContent=all.filter(m=>actual(m)==='Owned').length;
- $('ordered').textContent=all.filter(m=>actual(m)==='Ordered').length;
- $('missing').textContent=all.filter(m=>actual(m)==='Missing').length;
+ // Don't misrepresent public catalogue items as a guest's private collection.
+ $('owned').textContent=session?all.filter(m=>actual(m)==='Owned').length:'—';
+ $('ordered').textContent=session?all.filter(m=>actual(m)==='Ordered').length:'—';
+ $('missing').textContent=session?all.filter(m=>actual(m)==='Missing').length:'—';
  $('count').textContent=`${items.length} models`;
  $('models').innerHTML=items.map(m=>{
   const approved=photoOverrides[m.id];
@@ -37,7 +40,9 @@ function render(){
   const isPending=photoPending.has(m.id);
   const photoButton=isPending?'<button class="photo-action" disabled>Photo awaiting review</button>':`<button class="photo-action" type="button" data-photo-model="${esc(m.id)}">${imageUrl?'📷 Suggest replacement photo':'📷 Contribute a photo'}</button>`;
   const photoMarkup=imageUrl?`<a class="photo-link" href="${esc(approved||m.photoSource||m.photo)}" target="_blank" rel="noopener noreferrer" aria-label="Photo or source for ${esc(m.name)}"><img loading="lazy" src="${esc(imageUrl)}" alt="${approved?'Approved collector photo':'Product listing photo'}: ${esc(m.name)}" onerror="this.hidden=true;this.parentElement.nextElementSibling.hidden=false"></a><span class="photo-pending" hidden>Photo unavailable${m.photoSource?`<a class="source-link" href="${esc(m.photoSource)}" target="_blank" rel="noopener noreferrer">View product listing ↗</a>`:''}</span>`:`<span class="photo-pending">Exact product photo pending${m.photoSource?`<a class="source-link" href="${esc(m.photoSource)}" target="_blank" rel="noopener noreferrer">View product listing ↗</a>`:''}</span>`;
-  const tracking=m.community&&actual(m)==='Not tracking'
+  const tracking=!session
+    ?`<select aria-label="Choose status for ${esc(m.name)} — login required to save" data-id="${esc(m.id)}"><option value="" selected disabled>＋ Choose status to save</option>${statuses.map(status=>`<option value="${status}">${status}</option>`).join('')}</select>`
+    :m.community&&actual(m)==='Not tracking'
     ?`<button type="button" class="track-action" data-add-garage="${esc(m.id)}">＋ Add to my private garage</button>`
     :`<select aria-label="Collection status for ${esc(m.name)}" data-id="${esc(m.id)}">${(m.community?['Not tracking',...statuses]:statuses).map(status=>`<option ${actual(m)===status?'selected':''}>${status}</option>`).join('')}</select>`;
   return `<article class="model"><div class="photo">${photoMarkup}<span class="number">${m.number?`#${esc(m.number)}`:'SKU pending'}</span>${edition(m)==='Chase'?'<span class="variant">✦ CHASE</span>':edition(m)==='Event Exclusive'?'<span class="variant">EVENT</span>':edition(m)==='Limited Edition'?'<span class="variant">LIMITED</span>':''}</div><div class="info"><div class="muted">${esc(maker(m))} · ${esc(m.brand)}${m.community?' · Community verified':''}</div><div class="name">${esc(m.name)}</div><div class="sub"><span class="pill ${esc(String(m.release).toLowerCase())}">${esc(m.release)}</span></div>${photoButton}${tracking}</div></article>`;
@@ -47,6 +52,12 @@ function render(){
  document.querySelectorAll('button[data-add-garage]').forEach(btn=>btn.addEventListener('click',()=>saveStatus(btn.dataset.addGarage,'Wishlist')));
 }
 async function saveStatus(id,status){
+ if(!session){
+  // The selection was only a sign-in request: discard it, don't store it.
+  render();
+  openLoginDialog('Choose Google or email sign-in to create your saved list. Then select the model status again.',{savedList:true});
+  return;
+ }
  if(status==='Not tracking')delete state[id]; else state[id]=status;
  saveLocal();render();
  if(db&&session){
@@ -65,8 +76,12 @@ function displayName(){
  return String(metadata.full_name||metadata.name||session.user.email||'Collector');
 }
 function setLoginMessage(message){$('loginStatus').textContent=message||''}
-function openLoginDialog(message=''){
+function openLoginDialog(message='',{savedList=false}={}){
  $('accountMenu').hidden=true;$('accountBtn').setAttribute('aria-expanded','false');
+ $('loginTitle').textContent=savedList?'Log in to create a saved list':'Welcome to ARBOX Garage';
+ $('loginIntro').textContent=savedList
+  ?'A free account lets you mark models Owned, Ordered, Missing or Wishlist and save your garage across devices.'
+  :'One account, one private garage. Choose how you want to continue.';
  setLoginMessage(message);
  if(!$('loginDialog').open)$('loginDialog').showModal();
 }
@@ -76,7 +91,7 @@ function authUI(message=''){
  menu.hidden=true;button.setAttribute('aria-expanded','false');
  if(!cloudReady){
   button.textContent='Guest · Log in';
-  area.innerHTML='<b>Guest preview</b><div class="muted">Cloud sign-in is not configured. Your selections are saved only in this browser.</div>';
+  area.innerHTML='<b>Guest preview</b><div class="muted">Browse the catalogue. Log in to create a saved list; cloud sign-in must be configured first.</div>';
   return;
  }
  if(session){
@@ -88,11 +103,11 @@ function authUI(message=''){
   area.innerHTML=`<b>☁ Cloud sync enabled</b><div class="muted">Signed in: ${esc(session.user.email||label)}</div>${message?`<p class="muted">${esc(message)}</p>`:''}`;
  }else{
   button.textContent='👤 Log in';
-  $('accountIdentity').textContent='Guest · local collection';
+  $('accountIdentity').textContent='Guest · browsing only';
   $('accountSignOut').hidden=true;
   $('accountLogin').hidden=false;
   $('accountLogin').textContent='Log in / Sign up';
-  area.innerHTML=`<b>Guest mode</b><div class="muted">Browse all four brands and keep a local collection on this device. Sign in to sync across devices and submit models or photos.</div>${message?`<p class="muted">${esc(message)}</p>`:''}`;
+  area.innerHTML=`<b>Guest mode</b><div class="muted">Browse all four brands freely. To create a saved list or change a model's status, log in with Google or email.</div>${message?`<p class="muted">${esc(message)}</p>`:''}`;
  }
 }
 async function oauthLogin(provider){
@@ -131,7 +146,7 @@ async function refreshAll({quiet=false}={}){
   await loadPhotoContributions();
   await loadMyModelSubmissions();
   if(photoAdmin)await loadModelAdminQueue();
-  if(!quiet)authUI(session?'Your garage has been refreshed.':'Public catalogue refreshed. Guest changes stay on this device.');
+  if(!quiet)authUI(session?'Your garage has been refreshed.':'Public catalogue refreshed. Log in to save a personal list.');
  }catch(e){
   authUI('Refresh failed: '+e.message);
  }finally{refreshInProgress=false;button.disabled=false;button.textContent='↻ Refresh'}
@@ -178,7 +193,7 @@ async function loadCloud(){
 async function sync(){if(!db){authUI();return}const {data}=await db.auth.getSession();session=data.session;customModels=[];switchState();authUI();if(session)await loadCloud();await loadRadar();}
 function radarRender(){const el=$('feed');el.innerHTML=radar.length?radar.map(x=>`<div class="feeditem"><strong>${esc(x.title)}</strong><div class="muted">${esc(x.brand)} · ${esc(x.status||'TBA / review')} · ${esc((x.detected_at||'').slice(0,10))}</div><a href="${esc(x.url)}" target="_blank" rel="noopener noreferrer">View source ↗</a></div>`).join(''):'<div class="notice">No release leads have been collected yet. Enable the scheduled checker in GitHub Actions, then refresh.</div>'}
 async function loadRadar(){if(!db){radarRender();return}let {data,error}=await db.from('release_leads').select('title,brand,url,status,detected_at').order('detected_at',{ascending:false}).limit(40);if(error){$('feed').innerHTML='<div class="notice">Release feed unavailable: '+esc(error.message)+'</div>';return}radar=(data||[]).filter(x=>allowedBrands.some(b=>b.toLowerCase()===String(x.brand||'').toLowerCase()));radarRender()}
-function csv(){const rows=[['Number','Diecast Brand','Vehicle Make','Model','Edition','Release','Collection'],...allModels().map(m=>[m.number,maker(m),m.vehicleMake||m.brand,m.name,edition(m),m.release,actual(m)])];const s=rows.map(r=>r.map(x=>'"'+String(x).replace(/"/g,'""')+'"').join(',')).join('\r\n');let a=document.createElement('a');a.href=URL.createObjectURL(new Blob([s],{type:'text/csv'}));a.download='arbox-garage.csv';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
+function csv(){const rows=[['Number','Diecast Brand','Vehicle Make','Model','Edition','Release','Collection'],...allModels().map(m=>[m.number,maker(m),m.vehicleMake||m.brand,m.name,edition(m),m.release,session?actual(m):'Sign in to track'])];const s=rows.map(r=>r.map(x=>'"'+String(x).replace(/"/g,'""')+'"').join(',')).join('\r\n');let a=document.createElement('a');a.href=URL.createObjectURL(new Blob([s],{type:'text/csv'}));a.download='arbox-garage.csv';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
 function b64ToUint8(s){const p='='.repeat((4-s.length%4)%4);const raw=atob((s+p).replace(/-/g,'+').replace(/_/g,'/'));return Uint8Array.from(raw,c=>c.charCodeAt(0))}
 async function enablePush(){const status=$('pushStatus');if(!db||!session){status.textContent='Sign in to cloud sync first.';return}if(!C.vapidPublicKey){status.textContent='Add your VAPID public key to config.js first.';return}if(!('serviceWorker'in navigator)||!('PushManager'in window)){status.textContent='Push is not available in this browser. Open the installed Home Screen app.';return}try{const perm=await Notification.requestPermission();if(perm!=='granted'){status.textContent='Notifications not allowed.';return}let reg=await navigator.serviceWorker.ready;let sub=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:b64ToUint8(C.vapidPublicKey)});const {error}=await db.from('push_subscriptions').upsert({user_id:session.user.id,endpoint:sub.endpoint,subscription:sub.toJSON()},{onConflict:'user_id,endpoint'});if(error)throw error;status.textContent='Push subscription saved. Alerts will arrive when the scheduled checker finds a new lead.'}catch(e){status.textContent='Could not enable push: '+e.message}}
 function photoMessage(message){$('photoMessage').textContent=message}
