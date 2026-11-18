@@ -1,6 +1,5 @@
-// Public project settings only. NEVER put a service-role key here.
 window.ARBOX_CONFIG = {
-  supabaseUrl: '',
-  supabaseAnonKey: '',
+  supabaseUrl: 'https://emhnvoddopshgbnqoxjc.supabase.co',
+  supabaseAnonKey: 'sb_publishable_CXo2DExzX5-UyHmQjma-mg_ZKoP-WJS',
   vapidPublicKey: ''
 };
