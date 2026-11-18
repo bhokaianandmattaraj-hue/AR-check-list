@@ -1,8 +1,10 @@
 const $=id=>document.getElementById(id);const C=window.ARBOX_CONFIG||{};
 const cloudReady=!!(C.supabaseUrl&&C.supabaseAnonKey&&window.supabase);
 const db=cloudReady?window.supabase.createClient(C.supabaseUrl,C.supabaseAnonKey):null;
-let catalog=[],state={},session=null,filter='All',radar=[],customModels=[];
+let catalog=[],state={},session=null,filter='All',radar=[],customModels=[],communityModels=[];
 const PHOTO_BUCKET='arbox-photo-contributions';
+const MODEL_BUCKET='arbox-model-submissions';
+let modelPhotos=[]; 
 let photoOverrides={},photoPending=new Set(),photoAdmin=false,selectedPhotoModel=null,chosenPhotoBlob=null,previewObjectUrl=null;
 
 const guestKey='arbox-garage-guest-v2';
@@ -10,7 +12,7 @@ function getLocal(key){try{return JSON.parse(localStorage.getItem(key)||'{}')}ca
 function userKey(){return session?'arbox-garage-user-'+session.user.id:guestKey}
 function saveLocal(){localStorage.setItem(userKey(),JSON.stringify(state))}
 function switchState(){state=getLocal(userKey());render()}
-function allModels(){return [...catalog,...customModels].filter(eligible)}
+function allModels(){return [...catalog,...communityModels,...customModels].filter(eligible)}
 
 state=getLocal(guestKey);
 const statuses=['Owned','Ordered','Missing','Unconfirmed','Wishlist'];
@@ -20,7 +22,7 @@ function maker(m){return m.manufacturer||(m.brand==='Porsche'||m.brand==='Land R
 function eligible(m){return allowedBrands.includes(maker(m))}
 function edition(m){return m.editionType||(m.variant==='Chase'?'Chase':'Regular')}
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-function actual(m){return state[m.id]||'Missing'}
+function actual(m){return state[m.id]||(m.community?'Not tracking':'Missing')}
 function render(){
  const q=$('search').value.toLowerCase();
  const all=allModels();
@@ -35,12 +37,26 @@ function render(){
   const isPending=photoPending.has(m.id);
   const photoButton=isPending?'<button class="photo-action" disabled>Photo awaiting review</button>':`<button class="photo-action" type="button" data-photo-model="${esc(m.id)}">${imageUrl?'📷 Suggest replacement photo':'📷 Contribute a photo'}</button>`;
   const photoMarkup=imageUrl?`<a class="photo-link" href="${esc(approved||m.photoSource||m.photo)}" target="_blank" rel="noopener noreferrer" aria-label="Photo or source for ${esc(m.name)}"><img loading="lazy" src="${esc(imageUrl)}" alt="${approved?'Approved collector photo':'Product listing photo'}: ${esc(m.name)}" onerror="this.hidden=true;this.parentElement.nextElementSibling.hidden=false"></a><span class="photo-pending" hidden>Photo unavailable${m.photoSource?`<a class="source-link" href="${esc(m.photoSource)}" target="_blank" rel="noopener noreferrer">View product listing ↗</a>`:''}</span>`:`<span class="photo-pending">Exact product photo pending${m.photoSource?`<a class="source-link" href="${esc(m.photoSource)}" target="_blank" rel="noopener noreferrer">View product listing ↗</a>`:''}</span>`;
-  return `<article class="model"><div class="photo">${photoMarkup}<span class="number">${m.number?`#${esc(m.number)}`:'SKU pending'}</span>${edition(m)==='Chase'?'<span class="variant">✦ CHASE</span>':edition(m)==='Event Exclusive'?'<span class="variant">EVENT</span>':edition(m)==='Limited Edition'?'<span class="variant">LIMITED</span>':''}</div><div class="info"><div class="muted">${esc(maker(m))} · ${esc(m.brand)}</div><div class="name">${esc(m.name)}</div><div class="sub"><span class="pill ${esc(String(m.release).toLowerCase())}">${esc(m.release)}</span></div>${photoButton}<select aria-label="Collection status for ${esc(m.name)}" data-id="${esc(m.id)}">${statuses.map(s=>`<option ${actual(m)===s?'selected':''}>${s}</option>`).join('')}</select></div></article>`;
+  const tracking=m.community&&actual(m)==='Not tracking'
+    ?`<button type="button" class="track-action" data-add-garage="${esc(m.id)}">＋ Add to my private garage</button>`
+    :`<select aria-label="Collection status for ${esc(m.name)}" data-id="${esc(m.id)}">${(m.community?['Not tracking',...statuses]:statuses).map(status=>`<option ${actual(m)===status?'selected':''}>${status}</option>`).join('')}</select>`;
+  return `<article class="model"><div class="photo">${photoMarkup}<span class="number">${m.number?`#${esc(m.number)}`:'SKU pending'}</span>${edition(m)==='Chase'?'<span class="variant">✦ CHASE</span>':edition(m)==='Event Exclusive'?'<span class="variant">EVENT</span>':edition(m)==='Limited Edition'?'<span class="variant">LIMITED</span>':''}</div><div class="info"><div class="muted">${esc(maker(m))} · ${esc(m.brand)}${m.community?' · Community verified':''}</div><div class="name">${esc(m.name)}</div><div class="sub"><span class="pill ${esc(String(m.release).toLowerCase())}">${esc(m.release)}</span></div>${photoButton}${tracking}</div></article>`;
  }).join('')||'<p>No matching models.</p>';
  document.querySelectorAll('select[data-id]').forEach(sel=>sel.addEventListener('change',()=>saveStatus(sel.dataset.id,sel.value)));
  document.querySelectorAll('button[data-photo-model]').forEach(btn=>btn.addEventListener('click',()=>openPhotoDialog(btn.dataset.photoModel)));
+ document.querySelectorAll('button[data-add-garage]').forEach(btn=>btn.addEventListener('click',()=>saveStatus(btn.dataset.addGarage,'Wishlist')));
 }
-async function saveStatus(id,status){state[id]=status;saveLocal();render();if(db&&session){let {error}=await db.from('collection').upsert({user_id:session.user.id,model_id:id,status},{onConflict:'user_id,model_id'});if(error)alert('Saved on this phone but cloud sync failed: '+error.message)}}
+async function saveStatus(id,status){
+ if(status==='Not tracking')delete state[id]; else state[id]=status;
+ saveLocal();render();
+ if(db&&session){
+  const query=db.from('collection');
+  const {error}=status==='Not tracking'
+   ? await query.delete().eq('user_id',session.user.id).eq('model_id',id)
+   : await query.upsert({user_id:session.user.id,model_id:id,status},{onConflict:'user_id,model_id'});
+  if(error)alert('Saved locally, but cloud sync failed: '+error.message);
+ }
+}
 function authUI(message=''){let area=$('authArea');if(!cloudReady){area.innerHTML='<b>Local preview mode</b><p>Collection changes are saved on this device. To enable private cloud sync, fill in config.js and run schema.sql in Supabase.</p>';return}if(session){area.innerHTML=`<b>☁ Cloud sync enabled</b><div class="muted">Signed in: ${esc(session.user.email||'collector')}</div><div class="auth"><button id="signOut" class="outline">Sign out</button></div>${message?`<p>${esc(message)}</p>`:''}`;$('signOut').onclick=async()=>{await db.auth.signOut();session=null;customModels=[];switchState();authUI();};return}area.innerHTML=`<b>Sign in for cloud sync</b><p class="muted">Enter your email for a secure sign-in link.</p><div class="auth"><input id="email" type="email" placeholder="you@example.com"><button id="login" class="primary">Send sign-in link</button></div>${message?`<p>${esc(message)}</p>`:''}`;$('login').onclick=async()=>{let email=$('email').value.trim();if(!email)return;let {error}=await db.auth.signInWithOtp({email,options:{emailRedirectTo:location.origin+location.pathname}});authUI(error?error.message:'Check your email and open the sign-in link.')};}
 async function loadCloud(){
  if(!db||!session)return;
@@ -140,7 +156,7 @@ async function loadPhotoContributions(){
  if(!db){return}
  const {data:published,error:publishedError}=await db.from('model_photo_contributions').select('model_id,storage_path').eq('status','approved');
  if(publishedError){$('photoGeneralStatus').textContent='Photo service not ready: '+publishedError.message;return}
- const rows=(published||[]).filter(x=>catalog.some(m=>m.id===x.model_id));
+ const rows=(published||[]).filter(x=>allModels().some(m=>m.id===x.model_id));
  const nextOverrides={};
  if(rows.length){
   const {data:signed,error:signError}=await db.storage.from(PHOTO_BUCKET).createSignedUrls(rows.map(x=>x.storage_path),6*60*60);
@@ -154,13 +170,14 @@ async function loadPhotoContributions(){
  }else photoPending=new Set();
  render();
  if(session)await checkPhotoAdmin();
- else{$('photoAdminPanel').hidden=true;photoAdmin=false}
+ else{$('photoAdminPanel').hidden=true;$('modelAdminPanel').hidden=true;photoAdmin=false}
 }
 async function checkPhotoAdmin(){
  const {data,error}=await db.rpc('is_arbox_photo_admin');
  photoAdmin=!error&&data===true;
  $('photoAdminPanel').hidden=!photoAdmin;
- if(photoAdmin)await loadPhotoAdminQueue();
+ $('modelAdminPanel').hidden=!photoAdmin;
+ if(photoAdmin){await loadPhotoAdminQueue();await loadModelAdminQueue()}
 }
 async function loadPhotoAdminQueue(){
  if(!photoAdmin||!session)return;
@@ -184,6 +201,173 @@ async function loadPhotoAdminQueue(){
   await loadPhotoContributions();
  }));
 }
+
+// Community model catalogue. Only records explicitly approved by an administrator
+// are accessible here; private submissions never enter this result.
+async function loadPublishedModels(){
+ if(!db)return;
+ const results=[];
+ for(let offset=0;;offset+=500){
+  const {data,error}=await db.from('arbox_published_models').select('id,manufacturer,vehicle_make,name,number,edition_type,release,release_year,source_url,photo_paths').order('published_at',{ascending:true}).range(offset,offset+499);
+  if(error){$('modelGeneralStatus').textContent='Community catalogue unavailable: '+error.message;return}
+  results.push(...(data||[]));if(!data||data.length<500)break;
+ }
+ const withPhoto=results.filter(x=>x.photo_paths?.length);
+ const pictures={};
+ for(let offset=0;offset<withPhoto.length;offset+=40){
+  const batch=withPhoto.slice(offset,offset+40);
+  const {data,error}=await db.storage.from(MODEL_BUCKET).createSignedUrls(batch.map(m=>m.photo_paths[0]),6*60*60);
+  if(error){$('modelGeneralStatus').textContent='Some community photos could not be loaded: '+error.message;continue}
+  (data||[]).forEach((item,i)=>{if(item?.signedUrl&&!item.error)pictures[batch[i].id]=item.signedUrl});
+ }
+ communityModels=results.filter(x=>allowedBrands.includes(x.manufacturer)).map(x=>({
+  id:x.id,manufacturer:x.manufacturer,brand:x.vehicle_make,vehicleMake:x.vehicle_make,
+  name:x.name,number:x.number,variant:x.edition_type,editionType:x.edition_type,
+  release:x.release,releaseYear:x.release_year,photo:pictures[x.id]||null,
+  photoSource:safeSourceUrl(x.source_url),community:true
+ }));
+ render();
+}
+function safeSourceUrl(value){
+ try{const url=new URL(value);return ['https:','http:'].includes(url.protocol)?url.href:''}catch{return ''}
+}
+function modelStatus(message){$('modelSubmitStatus').textContent=message}
+function resetModelPhotos(){
+ modelPhotos.forEach(p=>URL.revokeObjectURL(p.preview));modelPhotos=[];
+ $('modelPhotoCameraInput').value='';$('modelPhotoGalleryInput').value='';
+ renderModelPhotos();
+}
+function renderModelPhotos(){
+ const area=$('modelPhotoPreviews');
+ area.innerHTML=modelPhotos.map((p,i)=>`<div class="model-photo-item"><img src="${esc(p.preview)}" alt="New model photo ${i+1}"><button type="button" data-remove-model-photo="${i}">Remove</button></div>`).join('');
+ area.querySelectorAll('[data-remove-model-photo]').forEach(button=>button.addEventListener('click',()=>{
+  const index=Number(button.dataset.removeModelPhoto);const [removed]=modelPhotos.splice(index,1);
+  if(removed)URL.revokeObjectURL(removed.preview);renderModelPhotos();
+ }));
+}
+async function prepareModelPhoto(file){
+ if(!file.type.startsWith('image/'))throw Error('Only image files are supported.');
+ if(file.size>25*1024*1024)throw Error('Each original photo must be under 25 MB.');
+ const tmp=URL.createObjectURL(file);
+ try{
+  const photo=await new Promise((resolve,reject)=>{
+   const img=new Image();img.onload=()=>resolve(img);
+   img.onerror=()=>reject(Error('Unable to open this picture on your device.'));
+   img.src=tmp;
+  });
+  const scale=Math.min(1,1600/Math.max(photo.naturalWidth,photo.naturalHeight));
+  const canvas=document.createElement('canvas');
+  canvas.width=Math.max(1,Math.round(photo.naturalWidth*scale));
+  canvas.height=Math.max(1,Math.round(photo.naturalHeight*scale));
+  const ctx=canvas.getContext('2d',{alpha:false});
+  if(!ctx)throw Error('Image conversion is not supported here.');
+  ctx.fillStyle='#fff';ctx.fillRect(0,0,canvas.width,canvas.height);
+  ctx.drawImage(photo,0,0,canvas.width,canvas.height);
+  const blob=await new Promise((resolve,reject)=>canvas.toBlob(b=>b?resolve(b):reject(Error('Unable to convert image.')),'image/jpeg',.8));
+  if(blob.size>5*1024*1024)throw Error('The compressed photo exceeds 5 MB.');
+  return {blob,preview:URL.createObjectURL(blob)};
+ }finally{URL.revokeObjectURL(tmp)}
+}
+async function addModelPhotos(files){
+ const incoming=Array.from(files||[]);
+ if(!incoming.length)return;
+ if(modelPhotos.length+incoming.length>3){modelStatus('You can submit up to 3 pictures per model.');return}
+ modelStatus('Preparing your photographs…');
+ try{
+  for(const file of incoming){modelPhotos.push(await prepareModelPhoto(file));renderModelPhotos()}
+  modelStatus(`${modelPhotos.length} photograph(s) ready. Images are re-encoded to remove embedded metadata.`);
+ }catch(e){modelStatus('Photo preparation failed: '+e.message)}
+ $('modelPhotoCameraInput').value='';$('modelPhotoGalleryInput').value='';
+}
+async function submitMissingModel(){
+ if(!db||!session){modelStatus('Sign in before submitting a model.');$('authArea').scrollIntoView({behavior:'smooth'});return}
+ const brand=$('modelBrand').value,vehicle_make=$('modelMake').value.trim(),name=$('modelName').value.trim(),
+  product_code=$('modelCode').value.trim(),edition_type=$('modelEdition').value,release=$('modelRelease').value,
+  source_url=$('modelSource').value.trim(),note=$('modelNote').value.trim();
+ const yearText=$('modelYear').value.trim();
+ const release_year=yearText?Number(yearText):null;
+ if(!allowedBrands.includes(brand)||!vehicle_make||name.length<3){modelStatus('Choose a supported brand and enter the vehicle manufacturer and full model name.');return}
+ if(name.length>180||vehicle_make.length>90||product_code.length>90||note.length>1000){modelStatus('One or more text fields are too long.');return}
+ if(yearText&&(!Number.isInteger(release_year)||release_year<1980||release_year>2100)){modelStatus('Enter a valid release year between 1980 and 2100, or leave it blank.');return}
+ if(source_url&&!safeSourceUrl(source_url)){modelStatus('Source must be an http or https website link.');return}
+ if(!source_url&&!modelPhotos.length){modelStatus('Attach at least one photograph or a source website link for verification.');return}
+ if(modelPhotos.length&&!$('modelConsent').checked){modelStatus('Please confirm you have permission to share these photos.');return}
+ const existing=allModels().filter(m=>maker(m)===brand&&
+  m.name.trim().toLowerCase()===name.toLowerCase()&&edition(m)===edition_type);
+ if(existing.length){
+  modelStatus('This model and edition are already listed. Please use a distinct model / livery name for a genuinely different release.');
+  return;
+ }
+ const submit=$('modelSubmitSend');submit.disabled=true;let id=null;
+ const photo_paths=modelPhotos.map(()=>`${session.user.id}/${crypto.randomUUID()}.jpg`);
+ const uploaded=[];
+ try{
+  modelStatus('Saving your private proposal…');
+  const {data,error}=await db.from('arbox_model_submissions').insert({
+   user_id:session.user.id,brand,vehicle_make,name,product_code,edition_type,release,release_year,
+   source_url,note,photo_paths
+  }).select('id').single();
+  if(error)throw error;id=data.id;
+  for(let i=0;i<photo_paths.length;i++){
+   modelStatus(`Uploading photograph ${i+1} of ${photo_paths.length}…`);
+   const {error:uploadError}=await db.storage.from(MODEL_BUCKET).upload(photo_paths[i],modelPhotos[i].blob,{contentType:'image/jpeg',upsert:false});
+   if(uploadError)throw uploadError;
+   uploaded.push(photo_paths[i]);
+  }
+  modelStatus('Submission received! It remains private until an administrator approves it.');
+  ['modelMake','modelName','modelCode','modelYear','modelSource','modelNote'].forEach(id=>$(id).value='');
+  $('modelBrand').value='ARBOX';$('modelEdition').value='Regular';$('modelRelease').value='Unverified';$('modelConsent').checked=false;
+  resetModelPhotos();await loadMyModelSubmissions();
+  if(photoAdmin)await loadModelAdminQueue();
+ }catch(e){
+  modelStatus('Submission failed: '+e.message);
+  // A failed upload must not leave a pending model available for approval.
+  if(id){
+   const {error:removeError}=await db.from('arbox_model_submissions').delete().eq('id',id).eq('status','pending');
+   if(!removeError&&uploaded.length)await db.storage.from(MODEL_BUCKET).remove(uploaded);
+  }
+ }finally{submit.disabled=false}
+}
+async function loadMyModelSubmissions(){
+ const area=$('myModelSubmissions');
+ if(!session||!db){area.innerHTML='<p class="muted">Sign in to see your proposals and their review statuses.</p>';return}
+ const {data,error}=await db.from('arbox_model_submissions').select('id,name,brand,status,review_note,submitted_at').eq('user_id',session.user.id).order('submitted_at',{ascending:false}).limit(15);
+ if(error){area.textContent='Unable to load your submissions: '+error.message;return}
+ area.innerHTML=(data||[]).length?(data||[]).map(x=>`<div class="model-submission-row"><strong>${esc(x.brand)} · ${esc(x.name)}</strong><span class="submission-status ${esc(x.status)}">${esc(x.status)}${x.review_note?' · '+esc(x.review_note):''}</span></div>`).join(''):'<p class="muted">No models submitted yet.</p>';
+}
+async function loadModelAdminQueue(){
+ if(!photoAdmin||!session)return;
+ const area=$('modelAdminQueue');area.textContent='Loading model proposals…';
+ const {data,error}=await db.from('arbox_model_submissions').select('id,brand,vehicle_make,name,product_code,edition_type,release,release_year,source_url,note,photo_paths,submitted_at').eq('status','pending').order('submitted_at',{ascending:true}).limit(30);
+ if(error){area.textContent='Review queue unavailable: '+error.message;return}
+ if(!data?.length){area.innerHTML='<p class="muted">No pending model submissions.</p>';return}
+ const cards=await Promise.all(data.map(async rec=>{
+  let photos=[];
+  if(rec.photo_paths?.length){
+   const {data:links}=await db.storage.from(MODEL_BUCKET).createSignedUrls(rec.photo_paths,3600);
+   photos=(links||[]).filter(x=>x?.signedUrl&&!x.error).map(x=>x.signedUrl);
+  }
+  const duplicates=allModels().filter(m=>maker(m)===rec.brand&&(
+   rec.product_code&&String(m.number||'').toLowerCase()===rec.product_code.toLowerCase()
+   ||m.name.trim().toLowerCase()===rec.name.trim().toLowerCase()));
+  const dupLabel=duplicates.length?`<p class="model-warning">⚠ Potential catalogue match: ${esc(duplicates.slice(0,3).map(m=>m.name).join('; '))}. Verify before approving.</p>`:'';
+  const source=safeSourceUrl(rec.source_url);
+  return `<article class="model-review"><strong>${esc(rec.brand)} · ${esc(rec.name)}</strong><p class="muted">Vehicle: ${esc(rec.vehicle_make)} · Code: ${esc(rec.product_code||'Not supplied')} · ${esc(rec.edition_type)} · ${esc(rec.release)}${rec.release_year?' · '+esc(rec.release_year):''}</p>${source?`<p><a href="${esc(source)}" target="_blank" rel="noopener noreferrer">Submitted source ↗</a></p>`:''}<p class="muted">Notes: ${esc(rec.note||'None')}</p>${dupLabel}<div class="model-review-photos">${photos.map(src=>`<img loading="lazy" src="${esc(src)}" alt="Photo supporting new model submission">`).join('')}</div><div class="review-actions"><button type="button" class="primary" data-model-review="${esc(rec.id)}" data-model-review-status="approved">Approve &amp; publish</button><button type="button" data-model-review="${esc(rec.id)}" data-model-review-status="rejected">Reject</button></div></article>`;
+ }));
+ area.innerHTML=cards.join('');
+ area.querySelectorAll('[data-model-review]').forEach(button=>button.addEventListener('click',async()=>{
+  const id=button.dataset.modelReview,status=button.dataset.modelReviewStatus;
+  let reviewNote='';
+  if(status==='rejected'){const entered=prompt('Reason for rejection (visible to submitter):');if(entered===null)return;reviewNote=entered.trim().slice(0,500)}
+  else if(!confirm('Have you verified this exact release, edition, code and image permission? Publish it for all collectors?'))return;
+  button.disabled=true;
+  const {error}=await db.rpc('review_arbox_model_submission',{p_id:id,p_status:status,p_review_note:reviewNote});
+  if(error){$('modelAdminMessage').textContent='Review failed: '+error.message;button.disabled=false;return}
+  $('modelAdminMessage').textContent=status==='approved'?'Model approved and added to the public catalogue.':'Model rejected.';
+  await loadPublishedModels();await loadModelAdminQueue();await loadMyModelSubmissions();
+ }));
+}
+
 async function start(){
  catalog=(await (await fetch('catalog.json')).json()).filter(eligible);
  render();
@@ -193,7 +377,7 @@ async function start(){
   document.querySelectorAll('#filters button').forEach(x=>x.classList.toggle('active',x===b));
   render();
  });
- $('syncBtn').onclick=async()=>{await sync();await loadPhotoContributions()};
+ $('syncBtn').onclick=async()=>{await sync();await loadPublishedModels();await loadPhotoContributions();await loadMyModelSubmissions()};
  $('refresh').onclick=loadRadar;
  $('export').onclick=csv;
  $('push').onclick=enablePush;
@@ -204,6 +388,13 @@ async function start(){
  $('photoClose').onclick=closePhotoDialog;
  $('photoSend').onclick=submitPhotoContribution;
  $('photoRefresh').onclick=loadPhotoAdminQueue;
+ $('modelPhotoCamera').onclick=()=>$('modelPhotoCameraInput').click();
+ $('modelPhotoGallery').onclick=()=>$('modelPhotoGalleryInput').click();
+ $('modelPhotoCameraInput').onchange=e=>addModelPhotos(e.target.files);
+ $('modelPhotoGalleryInput').onchange=e=>addModelPhotos(e.target.files);
+ $('modelSubmitSend').onclick=submitMissingModel;
+ $('modelAdminRefresh').onclick=loadModelAdminQueue;
+
  $('photoDialog').addEventListener('close',()=>{selectedPhotoModel=null;clearPhotoPreview()});
  if('serviceWorker'in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
  if(db){
@@ -211,10 +402,10 @@ async function start(){
    const old=session?.user?.id;session=s;
    if(old!==s?.user?.id){customModels=[];photoPending=new Set();switchState()}
    authUI();
-   if(s)setTimeout(async()=>{await loadCloud();await loadPhotoContributions()},0);
-   else {$('photoAdminPanel').hidden=true;photoAdmin=false;loadPhotoContributions()}
+   if(s)setTimeout(async()=>{await loadCloud();await loadPublishedModels();await loadPhotoContributions();await loadMyModelSubmissions()},0);
+   else {$('photoAdminPanel').hidden=true;$('modelAdminPanel').hidden=true;photoAdmin=false;loadPhotoContributions()}
   });
  }
- await sync();await loadPhotoContributions();
+ await sync();await loadPublishedModels();await loadPhotoContributions();await loadMyModelSubmissions();
 }
 start().catch(e=>{$('authArea').textContent='Could not load app: '+e.message});
