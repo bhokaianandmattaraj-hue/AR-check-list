@@ -6,8 +6,11 @@
     "name": "Land Rover 90 Camel Trophy Borneo 1985",
     "variant": "Regular",
     "release": "Released",
-    "status": "Missing",
-    "photoSource": "https://www.ebay.com/itm/318196789622"
+    "photoSource": "https://www.ebay.com/itm/318196789622",
+    "manufacturer": "ARBOX",
+    "vehicleMake": "Land Rover",
+    "editionType": "Regular",
+    "verification": "Existing catalogue entry — details and photos require independent verification"
   },
   {
     "id": "lr-32",
@@ -16,8 +19,11 @@
     "name": "Defender 110 Heritage Edition",
     "variant": "Regular",
     "release": "Released",
-    "status": "Missing",
-    "photoSource": "https://www.ebay.com/itm/306994368003"
+    "photoSource": "https://www.ebay.com/itm/306994368003",
+    "manufacturer": "ARBOX",
+    "vehicleMake": "Land Rover",
+    "editionType": "Regular",
+    "verification": "Existing catalogue entry — details and photos require independent verification"
   },
   {
     "id": "lr-35",
@@ -26,8 +32,11 @@
     "name": "Defender 90 Autobiography Edition",
     "variant": "Regular",
     "release": "Released",
-    "status": "Missing",
-    "photoSource": "https://www.chillbeathk.com/categories/almost-real-ar-box"
+    "photoSource": "https://www.chillbeathk.com/categories/almost-real-ar-box",
+    "manufacturer": "ARBOX",
+    "vehicleMake": "Land Rover",
+    "editionType": "Regular",
+    "verification": "Existing catalogue entry — details and photos require independent verification"
   },
   {
     "id": "lr-66",
@@ -36,8 +45,11 @@
     "name": "Defender 110 Camel Trophy Work Vehicle",
     "variant": "Regular",
     "release": "Released",
-    "status": "Ordered",
-    "photoSource": "https://www.mjtoysinc.com/shop-full-width/?product_count=24&product_order=asc&product_orderby=name&product_view=list"
+    "photoSource": "https://www.mjtoysinc.com/shop-full-width/?product_count=24&product_order=asc&product_orderby=name&product_view=list",
+    "manufacturer": "ARBOX",
+    "vehicleMake": "Land Rover",
+    "editionType": "Regular",
+    "verification": "Existing catalogue entry — details and photos require independent verification"
   },
   {
     "id": "p-2-1",
@@ -46,7 +58,10 @@
     "name": "911 GT3 R Macau #911 Presentation",
     "variant": "Regular",
     "release": "TBA",
-    "status": "Missing"
+    "manufacturer": "ARBOX",
+    "vehicleMake": "Porsche",
+    "editionType": "Regular",
+    "verification": "Existing catalogue entry — details and photos require independent verification"
   },
   {
     "id": "p-2-2",
@@ -55,7 +70,10 @@
     "name": "911 GT3 R Macau #911 Race",
     "variant": "Regular",
     "release": "TBA",
-    "status": "Missing"
+    "manufacturer": "ARBOX",
+    "vehicleMake": "Porsche",
+    "editionType": "Regular",
+    "verification": "Existing catalogue entry — details and photos require independent verification"
   },
   {
     "id": "p-2-3",
@@ -64,8 +82,11 @@
     "name": "911 GT3 R Macau #992 Race",
     "variant": "Regular",
     "release": "TBA",
-    "status": "Missing",
-    "photoSource": "https://www.pulsedrivers.com/diecast/catalog/11/"
+    "photoSource": "https://www.pulsedrivers.com/diecast/catalog/11/",
+    "manufacturer": "ARBOX",
+    "vehicleMake": "Porsche",
+    "editionType": "Regular",
+    "verification": "Existing catalogue entry — details and photos require independent verification"
   },
   {
     "id": "p-4",
@@ -74,7 +95,10 @@
     "name": "911 GT3 R Beijing #321",
     "variant": "Regular",
     "release": "TBA",
-    "status": "Missing"
+    "manufacturer": "ARBOX",
+    "vehicleMake": "Porsche",
+    "editionType": "Regular",
+    "verification": "Existing catalogue entry — details and photos require independent verification"
   },
   {
     "id": "p-45",
@@ -83,7 +107,10 @@
     "name": "911 F-Model Enamel Blue",
     "variant": "Regular",
     "release": "Released",
-    "status": "Missing"
+    "manufacturer": "ARBOX",
+    "vehicleMake": "Porsche",
+    "editionType": "Regular",
+    "verification": "Existing catalogue entry — details and photos require independent verification"
   },
   {
     "id": "p-51",
@@ -92,8 +119,11 @@
     "name": "911 GT3 R Sepang #918",
     "variant": "Regular",
     "release": "TBA",
-    "status": "Missing",
-    "photoSource": "https://www.mjtoysinc.com/shop-full-width/?product_count=24&product_order=asc&product_orderby=name&product_view=list"
+    "photoSource": "https://www.mjtoysinc.com/shop-full-width/?product_count=24&product_order=asc&product_orderby=name&product_view=list",
+    "manufacturer": "ARBOX",
+    "vehicleMake": "Porsche",
+    "editionType": "Regular",
+    "verification": "Existing catalogue entry — details and photos require independent verification"
   },
   {
     "id": "p-78",
@@ -102,7 +132,10 @@
     "name": "Panamera Turbo Sport Turismo",
     "variant": "Regular",
     "release": "Released",
-    "status": "Missing"
+    "manufacturer": "ARBOX",
+    "vehicleMake": "Porsche",
+    "editionType": "Regular",
+    "verification": "Existing catalogue entry — details and photos require independent verification"
   },
   {
     "id": "p-83-2",
@@ -111,8 +144,11 @@
     "name": "911 Cup Hero Car Gift Box",
     "variant": "Regular",
     "release": "TBA",
-    "status": "Missing",
-    "photoSource": "https://www.mjtoysinc.com/shop-full-width/?product_count=24&product_order=asc&product_orderby=name&product_view=list"
+    "photoSource": "https://www.mjtoysinc.com/shop-full-width/?product_count=24&product_order=asc&product_orderby=name&product_view=list",
+    "manufacturer": "ARBOX",
+    "vehicleMake": "Porsche",
+    "editionType": "Regular",
+    "verification": "Existing catalogue entry — details and photos require independent verification"
   },
   {
     "id": "p-88",
@@ -121,7 +157,10 @@
     "name": "Porsche 901 Signal Red",
     "variant": "Regular",
     "release": "Released",
-    "status": "Missing"
+    "manufacturer": "ARBOX",
+    "vehicleMake": "Porsche",
+    "editionType": "Regular",
+    "verification": "Existing catalogue entry — details and photos require independent verification"
   },
   {
     "id": "p-116",
@@ -130,7 +169,10 @@
     "name": "911 GT3 R Macau 2026 Presentation",
     "variant": "Regular",
     "release": "TBA",
-    "status": "Missing"
+    "manufacturer": "ARBOX",
+    "vehicleMake": "Porsche",
+    "editionType": "Regular",
+    "verification": "Existing catalogue entry — details and photos require independent verification"
   },
   {
     "id": "p-128",
@@ -139,7 +181,10 @@
     "name": "911 GT3 R Shanghai White Rabbit",
     "variant": "Regular",
     "release": "Preorder",
-    "status": "Missing"
+    "manufacturer": "ARBOX",
+    "vehicleMake": "Porsche",
+    "editionType": "Regular",
+    "verification": "Existing catalogue entry — details and photos require independent verification"
   },
   {
     "id": "rwb-74",
@@ -148,7 +193,10 @@
     "name": "RWB 930 Apple",
     "variant": "Regular",
     "release": "Released",
-    "status": "Ordered"
+    "manufacturer": "ARBOX",
+    "vehicleMake": "Porsche",
+    "editionType": "Regular",
+    "verification": "Existing catalogue entry — details and photos require independent verification"
   },
   {
     "id": "p-68-3-c",
@@ -157,9 +205,12 @@
     "name": "911 GT3 R Mandalika Chameleon Chase",
     "variant": "Chase",
     "release": "Released",
-    "status": "Owned",
     "photo": "https://aichanvault.com/cdn/shop/files/qCKF0wy.png?v=1786664486&width=1445",
-    "photoSource": "https://aichanvault.com/products/arbox-almost-real-1-64-68-3-porsche-911-gt3r-mandalika-chase"
+    "photoSource": "https://aichanvault.com/products/arbox-almost-real-1-64-68-3-porsche-911-gt3r-mandalika-chase",
+    "manufacturer": "ARBOX",
+    "vehicleMake": "Porsche",
+    "editionType": "Chase",
+    "verification": "Existing catalogue entry — details and photos require independent verification"
   },
   {
     "id": "p-52-c",
@@ -168,7 +219,10 @@
     "name": "911 GT3 R Gold Chrome Chase",
     "variant": "Chase",
     "release": "Unverified",
-    "status": "Unconfirmed"
+    "manufacturer": "ARBOX",
+    "vehicleMake": "Porsche",
+    "editionType": "Chase",
+    "verification": "Existing catalogue entry — details and photos require independent verification"
   },
   {
     "id": "rwb-28-c",
@@ -177,7 +231,10 @@
     "name": "RWB 930 Stella Artois Black Chrome Chase",
     "variant": "Chase",
     "release": "Unverified",
-    "status": "Unconfirmed"
+    "manufacturer": "ARBOX",
+    "vehicleMake": "Porsche",
+    "editionType": "Chase",
+    "verification": "Existing catalogue entry — details and photos require independent verification"
   },
   {
     "id": "rwb-29-c",
@@ -186,7 +243,10 @@
     "name": "RWB 993 Army Girl Chrome Chase",
     "variant": "Chase",
     "release": "Unverified",
-    "status": "Unconfirmed"
+    "manufacturer": "ARBOX",
+    "vehicleMake": "Porsche",
+    "editionType": "Chase",
+    "verification": "Existing catalogue entry — details and photos require independent verification"
   },
   {
     "id": "rwb-74-c",
@@ -195,6 +255,9 @@
     "name": "RWB Apple Chase (needs verification)",
     "variant": "Chase",
     "release": "Unverified",
-    "status": "Unconfirmed"
+    "manufacturer": "ARBOX",
+    "vehicleMake": "Porsche",
+    "editionType": "Chase",
+    "verification": "Existing catalogue entry — details and photos require independent verification"
   }
 ]
