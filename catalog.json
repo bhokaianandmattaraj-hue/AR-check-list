@@ -1,0 +1,23 @@
+[
+{"id":"lr-27","number":"27","brand":"Land Rover","name":"Land Rover 90 Camel Trophy Borneo 1985","variant":"Regular","release":"Released","status":"Missing"},
+{"id":"lr-32","number":"32","brand":"Land Rover","name":"Defender 110 Heritage Edition","variant":"Regular","release":"Released","status":"Missing"},
+{"id":"lr-35","number":"35","brand":"Land Rover","name":"Defender 90 Autobiography Edition","variant":"Regular","release":"Released","status":"Missing"},
+{"id":"lr-66","number":"66","brand":"Land Rover","name":"Defender 110 Camel Trophy Work Vehicle","variant":"Regular","release":"Released","status":"Ordered"},
+{"id":"p-2-1","number":"2-1","brand":"Porsche","name":"911 GT3 R Macau #911 Presentation","variant":"Regular","release":"TBA","status":"Missing"},
+{"id":"p-2-2","number":"2-2","brand":"Porsche","name":"911 GT3 R Macau #911 Race","variant":"Regular","release":"TBA","status":"Missing"},
+{"id":"p-2-3","number":"2-3","brand":"Porsche","name":"911 GT3 R Macau #992 Race","variant":"Regular","release":"TBA","status":"Missing"},
+{"id":"p-4","number":"4","brand":"Porsche","name":"911 GT3 R Beijing #321","variant":"Regular","release":"TBA","status":"Missing"},
+{"id":"p-45","number":"45","brand":"Porsche","name":"911 F-Model Enamel Blue","variant":"Regular","release":"Released","status":"Missing"},
+{"id":"p-51","number":"51","brand":"Porsche","name":"911 GT3 R Sepang #918","variant":"Regular","release":"TBA","status":"Missing"},
+{"id":"p-78","number":"78","brand":"Porsche","name":"Panamera Turbo Sport Turismo","variant":"Regular","release":"Released","status":"Missing"},
+{"id":"p-83-2","number":"83-2","brand":"Porsche","name":"911 Cup Hero Car Gift Box","variant":"Regular","release":"TBA","status":"Missing"},
+{"id":"p-88","number":"88","brand":"Porsche","name":"Porsche 901 Signal Red","variant":"Regular","release":"Released","status":"Missing"},
+{"id":"p-116","number":"116","brand":"Porsche","name":"911 GT3 R Macau 2026 Presentation","variant":"Regular","release":"TBA","status":"Missing"},
+{"id":"p-128","number":"128","brand":"Porsche","name":"911 GT3 R Shanghai White Rabbit","variant":"Regular","release":"Preorder","status":"Missing"},
+{"id":"rwb-74","number":"74","brand":"Porsche","name":"RWB 930 Apple","variant":"Regular","release":"Released","status":"Ordered"},
+{"id":"p-68-3-c","number":"68-3","brand":"Porsche","name":"911 GT3 R Mandalika Chameleon Chase","variant":"Chase","release":"Released","status":"Owned"},
+{"id":"p-52-c","number":"52","brand":"Porsche","name":"911 GT3 R Gold Chrome Chase","variant":"Chase","release":"Unverified","status":"Unconfirmed"},
+{"id":"rwb-28-c","number":"28","brand":"Porsche","name":"RWB 930 Stella Artois Black Chrome Chase","variant":"Chase","release":"Unverified","status":"Unconfirmed"},
+{"id":"rwb-29-c","number":"29","brand":"Porsche","name":"RWB 993 Army Girl Chrome Chase","variant":"Chase","release":"Unverified","status":"Unconfirmed"},
+{"id":"rwb-74-c","number":"74-C","brand":"Porsche","name":"RWB Apple Chase (needs verification)","variant":"Chase","release":"Unverified","status":"Unconfirmed"}
+]
